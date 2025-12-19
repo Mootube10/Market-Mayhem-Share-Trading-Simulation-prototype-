@@ -182,7 +182,7 @@
 
   function nextPeriod() {
     if (period >= 6) {
-      alert("Simulation complete! Final wealth: £" + (cash + companies.reduce((s,c)=>s+c.price*c.owned,0)).toLocaleString());
+      showResults();
       return;
     }
 
@@ -197,6 +197,34 @@
   }
 
   render();
+function showResults() {
+    const container = document.querySelector('.container');
+    const portfolio = companies.reduce((s,c)=>s+c.price*c.owned,0);
+    const wealth = cash + portfolio;
+
+    let rows = companies.map(c => {
+      return `<tr><td>${c.name}</td><td>£${c.price}</td><td>${c.owned}</td><td>£${(c.price*c.owned).toLocaleString()}</td></tr>`;
+    }).join('');
+
+    container.innerHTML = `
+      <div style="text-align:center">
+        <h2>📊 Trading Period 6 Results</h2>
+        <div class="card" style="margin:20px 0;font-size:20px">
+          Total Wealth<br><span>£${wealth.toLocaleString()}</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Company</th><th>Final Price</th><th>Shares</th><th>Value</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+
+        <p style="margin-top:20px;font-weight:600">Performance Grade: <strong>${wealth >= 180000 ? 'A' : wealth >= 150000 ? 'B' : wealth >= 120000 ? 'C' : 'D'}</strong></p>
+      </div>
+    `;
+  }
+
 </script>
 
 </body>

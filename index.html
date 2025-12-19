@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Market Mayhem – Share Trading Simulation</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: radial-gradient(circle at top, #0f766e, #020617);
+      color: #0f172a;
+    }
+
+    header {
+      background: #14b8a6;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .card span {
+      display: block;
+      margin-top: 6px;
+      font-size: 18px;
+      color: #0f766e;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 14px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: center;
+    }
+
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+    }
+
+    button {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .buy { background: #22c55e; color: white; }
+    .sell { background: #ef4444; color: white; }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .next {
+      background: #6366f1;
+      color: white;
+      padding: 12px 18px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<header>📈 Market Mayhem | Share Trading Simulation</header>
+
+<div class="container">
+
+  <div class="stats">
+    <div class="card">Period<span id="period">1 / 6</span></div>
+    <div class="card">Cash<span id="cash">£100,000</span></div>
+    <div class="card">Portfolio Value<span id="portfolio">£0</span></div>
+    <div class="card">Total Wealth<span id="wealth">£100,000</span></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Company</th>
+        <th>Industry</th>
+        <th>Share Price</th>
+        <th>You Own</th>
+        <th>Trade</th>
+      </tr>
+    </thead>
+    <tbody id="market"></tbody>
+  </table>
+
+  <div class="footer">
+    <button class="next" onclick="nextPeriod()">Next Period →</button>
+  </div>
+</div>
+
+<script>
+  let period = 1;
+  let cash = 100000;
+
+  const companies = [
+    { name: "Skyline Energy", industry: "Energy", price: 450, owned: 0 },
+    { name: "Medivance Biotech", industry: "Biotech", price: 825, owned: 0 },
+    { name: "Velocity Motors", industry: "Automotive", price: 620, owned: 0 },
+    { name: "NovaTech", industry: "Technology", price: 980, owned: 0 },
+    { name: "GreenHarvest", industry: "Agriculture", price: 310, owned: 0 }
+  ];
+
+  function render() {
+    const tbody = document.getElementById("market");
+    tbody.innerHTML = "";
+
+    let portfolio = 0;
+
+    companies.forEach((c, i) => {
+      portfolio += c.price * c.owned;
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${c.name}</td>
+        <td>${c.industry}</td>
+        <td>£${c.price}</td>
+        <td>${c.owned}</td>
+        <td>
+          <button class="buy" onclick="buy(${i})">Buy</button>
+          <button class="sell" onclick="sell(${i})">Sell</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    document.getElementById("cash").innerText = `£${cash.toLocaleString()}`;
+    document.getElementById("portfolio").innerText = `£${portfolio.toLocaleString()}`;
+    document.getElementById("wealth").innerText = `£${(cash + portfolio).toLocaleString()}`;
+    document.getElementById("period").innerText = `${period} / 6`;
+  }
+
+  function buy(i) {
+    if (cash >= companies[i].price) {
+      cash -= companies[i].price;
+      companies[i].owned++;
+      render();
+    }
+  }
+
+  function sell(i) {
+    if (companies[i].owned > 0) {
+      cash += companies[i].price;
+      companies[i].owned--;
+      render();
+    }
+  }
+
+  function nextPeriod() {
+    if (period >= 6) {
+      alert("Simulation complete! Final wealth: £" + (cash + companies.reduce((s,c)=>s+c.price*c.owned,0)).toLocaleString());
+      return;
+    }
+
+    period++;
+    companies.forEach(c => {
+      const change = 1 + (Math.random() * 0.2 - 0.1); // ±10%
+      c.price = Math.max(50, Math.round(c.price * change));
+    });
+
+    cash = Math.round(cash * 1.01); // 1% interest
+    render();
+  }
+
+  render();
+</script>
+
+</body>
+</html>
